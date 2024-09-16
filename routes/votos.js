@@ -144,17 +144,7 @@ router.get('/:id/detalhes', async (req, res) => {
     let totalVotos = 0;
     let fotoUrl = null
 
-    try {
-         decoded = await decodeToken(token);
-
-        if (!decoded || !decoded.usage ||decoded ==nulls) {
-            return res.json({ error: 'hahaha' });
-        }
-
-    } catch (error) {
-        console.log(error)
-
-    }
+    
     db.query('SELECT * FROM atas where id = ?', [id], (err, atas) => {
 
 
