@@ -37,7 +37,7 @@ async function decodeToken(token) {
         // Verifica o token
         jwt.verify(token, secretKey, (err, decoded) => {
             if (err) {
-                return reject('Token inválido ou expirado');
+                return reject('err');
             }
 
             const jti = decoded.jti;
@@ -46,7 +46,7 @@ async function decodeToken(token) {
             const tokenData = tokenStore[jti];
 
             if (!tokenData || tokenData.usages <= 0 || tokenData.expiresAt < Date.now()) {
-                return reject('Token inválido ou expirado');
+                return reject('err');
             }
 
             // Decrementa o contador de usos

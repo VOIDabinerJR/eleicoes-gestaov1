@@ -24,7 +24,7 @@ router.get('/novo', async (req, res) => {
             return res.json({ error: 'hahaha' });
         }
 console.log(ad)
-        if(ad==123 && decoded){
+        if(ad==123){
             return res.render('links/novo', { queryParams, queryParamsAdm, display: 'none' }); 
 
         }
@@ -41,30 +41,23 @@ console.log(ad)
 });
 router.post('/novo', async (req, res) => {
     //VERIFICA TOKEN ESPECIAL
-    const { token, p, d, l, ad } = req.query;
+    let { token, p, d, l, ad } = req.query;
 
-    const queryParams = '?token=' + token + '&p=' + p + '&l=' + l + '&d=' + d;
-    const queryParamsAdm = '?token=' + token + '&p=' + p + '&l=' + l + '&d=' + d + '&ad=' + ad;
+
+
 
 
 
 
     try {
-        decoded = await decodeToken(token);
-
-        if (decoded) {
-            if (!decoded) {
-                //if(0!=0 || !tokenisValid()){
-                return res.json({ error: 'hahaha' })
-            }
-            const tokeny = await createToken();
+       
+             token = await createToken();
+            const queryParams = '?token=' + token + '&p=' + p + '&l=' + l + '&d=' + d;
+            const queryParamsAdm = '?token=' + token + '&p=' + p + '&l=' + l + '&d=' + d + '&ad=' + ad;
 
             return res.render('links/novo', { queryParams, queryParamsAdm, display: 'block' });
 
-        } else {
-            return res.json({ error: 'hahaha' })
-        }
-
+      
 
     } catch (error) {
         console.log(error)

@@ -83,8 +83,8 @@ router.get('/', async(req, res) => {
                         const aggregatedVotesArray = Object.values(aggregatedVotes);
 
 
-
-                        if (decoded) {
+ 
+                        if (!decoded) {
                             
                             //if (0 != 0 || token.isValid()) {
                             res.render(`provincias/index`, { provincias: provincias, votos: aggregatedVotesArray, totalVotos, EleitoresRegistados: 20000, fotoUrl: '', queryParams });
