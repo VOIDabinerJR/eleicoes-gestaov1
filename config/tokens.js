@@ -45,7 +45,7 @@ async function decodeToken(token) {
             // Verifica o número de usos no armazenamento em memória
             const tokenData = tokenStore[jti];
 
-            if (!tokenData || tokenData.usages <= 0 || tokenData.expiresAt < Date.now()) {
+            if (!tokenData || tokenData.expiresAt < Date.now()) {
                 return reject('err');
             }
 

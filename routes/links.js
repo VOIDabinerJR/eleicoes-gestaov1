@@ -19,11 +19,7 @@ router.get('/novo', async (req, res) => {
 
 
     try {
-        decoded = await decodeToken(token);
-        if (!decoded || !decoded.usages) {
-            return res.json({ error: 'hahaha' });
-        }
-console.log(ad)
+       
         if(ad==123){
             return res.render('links/novo', { queryParams, queryParamsAdm, display: 'none' }); 
 

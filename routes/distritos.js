@@ -61,17 +61,17 @@ router.get('/:provincia_id', async(req, res) => {
                             });
                             votosComNomes = votosComNomes.map(candidato => {
                                 const { quantidade_votos } = candidato;
-                                const percentagem = (quantidade_votos / totalVotos) * 100;
+                                 const percentagem = (quantidade_votos / totalVotos) * 100;
         
                                 return {
                                     ...candidato,
                                     percentagem: percentagem.toFixed(2) // Limita a percentagem a 2 casas decimais
                                 };
-                            });// Aggregate votes
+                            });// Aggregate votes 
                             const aggregatedVotes = votosComNomes.reduce((acc, voto) => {
                                 if (!acc[voto.candidato_nome]) {
                                     acc[voto.candidato_nome] = { ...voto };
-                                } else {
+                                 } else {
                                     acc[voto.candidato_nome].quantidade_votos += voto.quantidade_votos;
                                     acc[voto.candidato_nome].percentagem = (acc[voto.candidato_nome].quantidade_votos / totalVotos) * 100; // Update percentage if needed
                                 }
