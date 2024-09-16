@@ -5,10 +5,11 @@ const multer = require('multer');
 const multerStorageCloudinary = require('multer-storage-cloudinary');
 const path = require('path');
 const db = require('../config/db');
-
+const { createToken, decodeToken } = require('../config/tokens');
+let decoded =null;
 
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
+    destination: function (req, file, cb) { 
         cb(null, 'uploads/');
     },
     filename: function (req, file, cb) {
@@ -42,9 +43,9 @@ router.get('/:mesa_id', async (req, res) => {
     try {
 
         try {
-            const decoded = await decodeToken(token);
+             decoded = await decodeToken(token);
     
-            if (!decoded || !decoded.usages) {
+            if (!decoded || !decoded.usages ||decoded ==null) {
                 return res.json({ error: 'hahaha' });
             }
     
@@ -105,7 +106,7 @@ router.get('/:mesa_id', async (req, res) => {
 
 
 
-                        if (decoded.usages) {
+                        if (decoded) {
                             res.render('votos/index', { atas: atas, mesa_id, votos: aggregatedVotesArray, totalVotos, EleitoresRegistados: 20000, queryParams });
                         } else {
                             res.render('votos/main', { atas: atas, mesa_id, votos: aggregatedVotesArray, totalVotos, EleitoresRegistados: 20000 });
@@ -144,9 +145,9 @@ router.get('/:id/detalhes', async (req, res) => {
     let fotoUrl = null
 
     try {
-        const decoded = await decodeToken(token);
+         decoded = await decodeToken(token);
 
-        if (!decoded || !decoded.usages) {
+        if (!decoded || !decoded.usage ||decoded ==nulls) {
             return res.json({ error: 'hahaha' });
         }
 
@@ -193,7 +194,7 @@ router.get('/:id/detalhes', async (req, res) => {
                         };
                     });
 
-                    if (decoded.usages) {
+                    if (decoded) {
                         res.render('votos/detalhes', { atas: atas, votos: votosComNomes, totalVotos, fotoUrl, EleitoresRegistados: 20000 });
                     } else {
                         res.render('votos/detalhes2', { atas: atas, votos: votosComNomes, totalVotos, fotoUrl, EleitoresRegistados: 20000 });
@@ -216,9 +217,9 @@ router.get('/:mesa_id/novo', async (req, res) => {
     const queryParams = '?token=' + token + '&p=' + p + '&l=' + l + '&d=' + d;
 
     try {
-        const decoded = await decodeToken(token);
+         decoded = await decodeToken(token);
 
-        if (!decoded || !decoded.usages) {
+        if (!decoded || !decoded.usages ||decoded ==null) {
             return res.json({ error: 'hahaha' });
         }
 
@@ -249,9 +250,9 @@ router.post('/:mesa_id/novo', upload.single('foto'),async (req, res) => {
     let insertId = 0;
 
     try {
-        const decoded = await decodeToken(token);
+         decoded = await decodeToken(token);
 
-        if (!decoded || !decoded.usages) {
+        if (!decoded || !decoded.usages ||decoded ==null) {
             return res.json({ error: 'hahaha' });
         }
 

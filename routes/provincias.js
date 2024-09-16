@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
-
+const { createToken, decodeToken } = require('../config/tokens');
+let decoded =null;
 
 
 // Exibir províncias
@@ -10,15 +11,18 @@ router.get('/', async(req, res) => {
 
     const { token,p,d,l } = req.query;
     const queryParams = '?token='+ token +'&p='+p+'&l='+l+'&d='+d;
+    console.log(req.query)
 
     let provincias = {};
     let aggregatedVotesArray = {};
 
 
-    try {
+    try { 
         let totalVotos = 0;
         try {
-            const decoded = await decodeToken(token);
+            console.log(decoded)
+            decoded = await decodeToken(token);
+            console.log(decoded)
     
             if (!decoded || !decoded.usages) {
                 return res.json({ error: 'hahaha' });
@@ -80,7 +84,8 @@ router.get('/', async(req, res) => {
 
 
 
-                        if (decoded.usages) {
+                        if (decoded) {
+                            
                             //if (0 != 0 || token.isValid()) {
                             res.render(`provincias/index`, { provincias: provincias, votos: aggregatedVotesArray, totalVotos, EleitoresRegistados: 20000, fotoUrl: '', queryParams });
                         } else {
@@ -110,7 +115,7 @@ router.get('/novo',async (req, res) => {
     try {
         const decoded = await decodeToken(token);
 
-        if (!decoded || !decoded.usages) {
+        if (!decoded || !decoded.usages ||decoded ==null) {
             return res.json({ error: 'hahaha' });
         }
 
@@ -131,7 +136,7 @@ router.post('/novo',async (req, res) => {
     try {
         const decoded = await decodeToken(token);
 
-        if (!decoded || !decoded.usages) {
+        if (!decoded || !decoded.usages ||decoded ==null) {
             return res.json({ error: 'hahaha' });
         }
 

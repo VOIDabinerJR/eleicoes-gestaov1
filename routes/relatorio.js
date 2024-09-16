@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
-
+const { createToken, decodeToken } = require('../config/tokens');
+let decoded =null;
 // Relatório de votos por província
 router.get('/provincia', (req, res) => {
       let provincias= {};

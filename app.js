@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const cloudinary = require('cloudinary').v2;
 const multer = require('multer');
 const multerStorageCloudinary = require('multer-storage-cloudinary');
+const { createToken, decodeToken } = require('./config/tokens');
 require('dotenv').config();
 
 
@@ -42,16 +43,28 @@ app.use('/localidades', localidadesRouter);
 app.use('/votos', votosRouter);
 app.use('/relatorio', relatorioRouter);
 app.use('/links', linksRouter);
-
+let decoded = null
 // Página inicial
-app.get('/', (req, res) => {
-    const {token} =req.query;
+app.get('/', async(req, res) => {
+    const { token,p,d,l,ad } = req.query;
+    const queryParams = '?token='+ token +'&p='+p+'&l='+l+'&d='+d+'&ad='+ad;
+    
+    try {
+        const decoded = await decodeToken(token);
+        console.log(decoded);
 
-    if(token=='1234'){
-        res.render('index');
-    }else if(token=='0000'){
-        res.render('admin');
-    } else {
+        if (!decoded || !decoded.usages || decoded == null) {
+            return res.json({ error: 'Invalid or expired token' });
+        }
+
+        // Simplified routing logic
+        if (ad==123 && decoded) {
+            res.render('admin', {queryParams});
+        } else {
+            res.render('index', {queryParams});
+        }
+    } catch (error) {
+        console.log('Token decoding error:', error);
         res.render('main');
     }
 });

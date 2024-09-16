@@ -14,16 +14,16 @@ const tokenStore = {};
 async function createToken() {
     try {
         const jti = uuidv4(); // ID único para o token
-        const payload = { user, jti, usages: 20 };
+        const payload = { user, jti, usages: 200000 };
         const token = jwt.sign(payload, secretKey, { expiresIn: '1h' });
 
         // Armazena no armazenamento em memória com contagem de usos
-        tokenStore[jti] = { usages: 20, expiresAt: Date.now() + 3600 * 1000 }; // 1 hora em milissegundos
+        tokenStore[jti] = { usages: 200000, expiresAt: Date.now() + 3600 * 1000 }; // 1 hora em milissegundos
 
         console.log("Token criado:", token);
-        return token;
+        return token; 
     } catch (err) {
-        console.error('Erro ao criar o token:', err);
+        console.error('Erro ao criar o token:', err); 
         throw err;
     }
 }

@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
+const { createToken, decodeToken } = require('../config/tokens');
+let decoded =null;
 
 // Exibir localidades por distrito
 router.get('/:distrito_id',async (req, res) => {
@@ -11,7 +13,7 @@ router.get('/:distrito_id',async (req, res) => {
 
     try {
         try {
-            const decoded = await decodeToken(token);
+             decoded = await decodeToken(token);
     
             if (!decoded || !decoded.usages) {
                 return res.json({ error: 'hahaha' });
@@ -79,7 +81,7 @@ router.get('/:distrito_id',async (req, res) => {
                             console.log(mesas)
         
                             
-                            if (decoded.usages) {
+                            if (decoded) {
                             //if (0 != 0 || token.isValid()) {
                                 res.render('localidades/index', { localidades: mesas, distrito_id, votos: aggregatedVotesArray, totalVotos, EleitoresRegistados: 20000, fotoUrl:'',queryParams});
                             } else {
@@ -108,7 +110,7 @@ router.get('/:distrito_id/novo', async(req, res) => {
     const { token,p,d,l } = req.query;
     const queryParams = '?token='+ token +'&p='+p+'&l='+l+'&d='+distrito_id;
     try {
-        const decoded = await decodeToken(token);
+         decoded = await decodeToken(token);
 
         if (!decoded || !decoded.usages) {
             return res.json({ error: 'hahaha' });
@@ -128,7 +130,7 @@ router.post('/:distrito_id/novo', async(req, res) => {
     const { token,p,d,l } = req.query;
     const queryParams = '?token='+ token +'&p='+p+'&l='+l+'&d='+distrito_id;
     try {
-        const decoded = await decodeToken(token);
+         decoded = await decodeToken(token);
 
         if (!decoded || !decoded.usages) {
             return res.json({ error: 'hahaha' });

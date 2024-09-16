@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
+const { createToken, decodeToken } = require('../config/tokens');
+let decoded =null;
 
 // Exibir distritos por província
 router.get('/:provincia_id', async(req, res) => {
@@ -8,11 +10,11 @@ router.get('/:provincia_id', async(req, res) => {
     const { token,p,d,l } = req.query;
     const queryParams = '?token='+ token +'&p='+provincia_id+'&l='+l+'&d='+d;
     console.log(queryParams)
-    
+     
 
     try {
         try {
-            const decoded = await decodeToken(token);
+             decoded = await decodeToken(token);
     
             if (!decoded || !decoded.usages) {
                 return res.json({ error: 'hahaha' });
@@ -79,7 +81,7 @@ router.get('/:provincia_id', async(req, res) => {
                         
         
                             
-                            if (decoded.usages) {
+                            if (decoded) {
                             //if (0 != 0 || token.isValid()) {
                                 res.render('distritos/index', { distritos: distritos, provincia_id, votos: aggregatedVotesArray, totalVotos, EleitoresRegistados: 20000, fotoUrl:'',queryParams});
                             } else {
@@ -103,15 +105,22 @@ router.get('/:provincia_id', async(req, res) => {
 });
 
 // Formulário para adicionar distrito
-router.get('/:provincia_id/novo', (req, res) => {
+router.get('/:provincia_id/novo', async(req, res) => {
     const { token,p,d,l } = req.query;
     const { provincia_id } = req.params;
     const queryParams = '?token='+ token +'&p='+provincia_id+'&l='+l+'&d='+d;
 
-    if (token != '1234') {
-        //if(0!=0 || !tokenisValid()){
-        return res.json({ error: 'hahaha' })
-    }
+    try {
+        decoded = await decodeToken(token); 
+
+       if (!decoded || !decoded.usages) {
+           return res.json({ error: 'hahaha' });
+       }
+
+   } catch (error) {
+       console.log(error)
+
+   }
     res.render('distritos/novo', { provincia_id,queryParams });
 });
 
@@ -123,7 +132,7 @@ router.post('/:provincia_id/novo',async (req, res) => {
     const queryParams = '?token='+ token +'&p='+provincia_id+'&l='+l+'&d='+d;
 
     try {
-        const decoded = await decodeToken(token);
+         decoded = await decodeToken(token);
 
         if (!decoded || !decoded.usages) {
             return res.json({ error: 'hahaha' });
@@ -140,3 +149,4 @@ router.post('/:provincia_id/novo',async (req, res) => {
 });
 
 module.exports = router;
+ 

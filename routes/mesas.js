@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
-
+const { createToken, decodeToken } = require('../config/tokens');
+let decoded =null;
 // Exibir mesas
 router.get('/:localidade_id', async(req, res) => {
     const { localidade_id } = req.params;
@@ -11,9 +12,9 @@ router.get('/:localidade_id', async(req, res) => {
     
     try {
         try {
-            const decoded = await decodeToken(token);
+             decoded = await decodeToken(token);
     
-            if (!decoded || !decoded.usages) {
+            if (!decoded || !decoded.usages ||decoded ==null) {
                 return res.json({ error: 'hahaha' });
             }
     
@@ -77,7 +78,7 @@ router.get('/:localidade_id', async(req, res) => {
                             console.log(mesas)
         
                             
-                            if (dedoded.usages) {
+                            if (decoded) {
                             //if (0 != 0 || token.isValid()) {
                                 res.render('mesas/index', { mesas: mesas, localidade_id, votos: aggregatedVotesArray, totalVotos, EleitoresRegistados: 20000, fotoUrl:'', queryParams});
                             } else {
@@ -107,9 +108,9 @@ router.get('/:localidade_id/novo',async (req, res) => {
     const { token,p,d,l } = req.query;
     const queryParams = '?token='+ token +'&p='+p+'&l='+localidade_id+'&d='+d;
     try {
-        const decoded = await decodeToken(token);
+         decoded = await decodeToken(token);
 
-        if (!decoded || !decoded.usages) {
+        if (!decoded || !decoded.usages ||decoded ==null) {
             return res.json({ error: 'hahaha' });
         }
 
@@ -133,7 +134,7 @@ router.post('/:localidade_id/novo', async(req, res) => {
     try {
         const decoded = await decodeToken(token);
 
-        if (!decoded || !decoded.usages) {
+        if (!decoded || !decoded.usages ||decoded ==null) {
             return res.json({ error: 'hahaha' });
         }
 
@@ -147,5 +148,5 @@ router.post('/:localidade_id/novo', async(req, res) => {
     });
 });
 
-module.exports = router;
+module.exports = router; 
  
