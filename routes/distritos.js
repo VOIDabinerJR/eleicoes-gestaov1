@@ -81,7 +81,7 @@ router.get('/:provincia_id', async(req, res) => {
                         
         
                             
-                            if (decoded && decoded !=null && decoded !='err') {
+                            if (decoded) {
                             //if (0 != 0 || token.isValid()) {
                                 res.render('distritos/index', { distritos: distritos, provincia_id, votos: aggregatedVotesArray, totalVotos, EleitoresRegistados: 20000, fotoUrl:'',queryParams});
                             } else {
