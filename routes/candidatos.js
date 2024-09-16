@@ -13,7 +13,7 @@ router.get('/',async (req, res) => {
 
         if (!decoded || !decoded.usages) {
             return res.json({ error: 'hahaha' });
-        }
+        }  ;
 
     } catch (error) {
         console.log(error)
