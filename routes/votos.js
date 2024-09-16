@@ -35,12 +35,23 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Exibir votos
-router.get('/:mesa_id', (req, res) => {
-    const { token,p,d,l } = req.query;
-    const queryParams = '?token='+ token +'&p='+p+'&l='+l+'&d='+d;
+router.get('/:mesa_id', async (req, res) => {
+    const { token, p, d, l } = req.query;
+    const queryParams = '?token=' + token + '&p=' + p + '&l=' + l + '&d=' + d;
 
     try {
 
+        try {
+            const decoded = await decodeToken(token);
+    
+            if (!decoded || !decoded.usages) {
+                return res.json({ error: 'hahaha' });
+            }
+    
+        } catch (error) {
+            console.log(error)
+    
+        }
 
         let totalVotos = 0;
         const { mesa_id } = req.params;
@@ -91,10 +102,10 @@ router.get('/:mesa_id', (req, res) => {
                             return acc;
                         }, {});
                         const aggregatedVotesArray = Object.values(aggregatedVotes);
-                        
 
 
-                        if (token == '1234') {
+
+                        if (decoded.usages) {
                             res.render('votos/index', { atas: atas, mesa_id, votos: aggregatedVotesArray, totalVotos, EleitoresRegistados: 20000, queryParams });
                         } else {
                             res.render('votos/main', { atas: atas, mesa_id, votos: aggregatedVotesArray, totalVotos, EleitoresRegistados: 20000 });
@@ -124,13 +135,25 @@ router.get('/:mesa_id', (req, res) => {
 
 
 // Exibir votos detalhados
-router.get('/:id/detalhes', (req, res) => {
+router.get('/:id/detalhes', async (req, res) => {
     const { id } = req.params;
-    const { token,p,d,l } = req.query;
-    const queryParams = '?token='+ token +'&p='+p+'&l='+l+'&d='+d;
-let atas =null;
+    const { token, p, d, l } = req.query;
+    const queryParams = '?token=' + token + '&p=' + p + '&l=' + l + '&d=' + d;
+    let atas = null;
     let totalVotos = 0;
     let fotoUrl = null
+
+    try {
+        const decoded = await decodeToken(token);
+
+        if (!decoded || !decoded.usages) {
+            return res.json({ error: 'hahaha' });
+        }
+
+    } catch (error) {
+        console.log(error)
+
+    }
     db.query('SELECT * FROM atas where id = ?', [id], (err, atas) => {
 
 
@@ -170,10 +193,10 @@ let atas =null;
                         };
                     });
 
-                    if (token =='1234') {
-                        res.render('votos/detalhes', { atas:atas,votos: votosComNomes, totalVotos, fotoUrl, EleitoresRegistados: 20000 });
+                    if (decoded.usages) {
+                        res.render('votos/detalhes', { atas: atas, votos: votosComNomes, totalVotos, fotoUrl, EleitoresRegistados: 20000 });
                     } else {
-                        res.render('votos/detalhes2', { atas:atas,votos: votosComNomes, totalVotos, fotoUrl, EleitoresRegistados: 20000 });
+                        res.render('votos/detalhes2', { atas: atas, votos: votosComNomes, totalVotos, fotoUrl, EleitoresRegistados: 20000 });
                     }
                 })
                 .catch(err => {
@@ -187,41 +210,55 @@ let atas =null;
 });
 
 //   
-router.get('/:mesa_id/novo', (req, res) => {
+router.get('/:mesa_id/novo', async (req, res) => {
     const { mesa_id } = req.params;
-    const { token,p,d,l } = req.query;
-    const queryParams = '?token='+ token +'&p='+p+'&l='+l+'&d='+d;
-    if (token != '1234') {
-        //if(0!=0 || !tokenisValid()){
-        return res.json({ error: 'hahaha' })
+    const { token, p, d, l } = req.query;
+    const queryParams = '?token=' + token + '&p=' + p + '&l=' + l + '&d=' + d;
+
+    try {
+        const decoded = await decodeToken(token);
+
+        if (!decoded || !decoded.usages) {
+            return res.json({ error: 'hahaha' });
+        }
+
+    } catch (error) {
+        console.log(error)
+
     }
 
     db.query('SELECT * FROM candidatos ', [mesa_id], (err, rows) => {
         if (err) throw err;
 
-        res.render('votos/novo', { candidatos: rows, mesa_id , queryParams});
+        res.render('votos/novo', { candidatos: rows, mesa_id, queryParams });
     });
 
 });
 
 
-router.post('/:mesa_id/novo', upload.single('foto'), (req, res) => {
+router.post('/:mesa_id/novo', upload.single('foto'),async (req, res) => {
     const foto = req.file;
     const { candidatos } = req.body;
     const { mesa_id } = req.params;
-    const { token,p,d,l } = req.query;
-    const queryParams = '?token='+ token +'&p='+p+'&l='+l+'&d='+d;
+    const { token, p, d, l } = req.query;
+    const queryParams = '?token=' + token + '&p=' + p + '&l=' + l + '&d=' + d;
 
     console.log(req.query);
     console.log('a')
     let totalVotos = 0;
     let insertId = 0;
 
-    if (token != '1234') {
-        //if(0!=0 || !tokenisValid()){
-        return res.json({ error: 'hahaha' })
-    }
+    try {
+        const decoded = await decodeToken(token);
 
+        if (!decoded || !decoded.usages) {
+            return res.json({ error: 'hahaha' });
+        }
+
+    } catch (error) {
+        console.log(error)
+
+    }
 
 
     if (foto) {
@@ -252,7 +289,7 @@ router.post('/:mesa_id/novo', upload.single('foto'), (req, res) => {
                     const { id, votos } = candidato;
                     if (id != 'null' && id != null) {
                         db.query('INSERT INTO votos (mesa_id, ata_id ,candidato_id, quantidade_votos,localidade_id,distrito_id,provincia_id) VALUES (?, ?, ?, ?,?,?,?)',
-                            [mesa_id, parseInt(ataId), id, votos,l,d,p], (err) => {
+                            [mesa_id, parseInt(ataId), id, votos, l, d, p], (err) => {
                                 if (err) throw err;
                             });
                     }

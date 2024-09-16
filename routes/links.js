@@ -8,49 +8,65 @@ const { createToken, decodeToken } = require('../config/tokens');
 
 
 // Formulário para adicionar candidato
-router.get('/novo', (req, res) => {
+router.get('/novo', async(req, res) => {
+
     //VERIFICA TOKEN ESPECIAL
-   
-
-    const user = { id: 1, username: 'mamau' };
-
-    ///depois
-    const token = createToken()
-    console.log(token)
-
-    if (process.env.SECRET_KEY === req.query) {
-
-        res.render('links/novo', { link: token || '' });
-    } else {
-        res.render('links/novo', { link: token || '' });
-    }
-
-});
-router.post('/novo', async (req, res)  => {
-    //VERIFICA TOKEN ESPECIAL
-    const secretKey = process.env.SECRET_KEY
-
-    const user = { id: 1, username: 'mamau' };
-
-    ///depois
-    async function createNewToken() {
-        try {
-            const token = await createToken({ id: 1, username: 'user123' });
-            console.log('Token criado:', token);
-        } catch (err) {
-            console.error('Erro ao criar token:', err);
-        }
-    }
-    const token =  createNewToken(); 
+    const { token } = req.query;
     
 
-    if (process.env.SECRET_KEY === req.query) {
-
-        res.render('links/novo', { link: token || '' });
-    } else {
-        res.render('links/novo', { link: token || '' });
+   try {
+     decoded = await decodeToken(token);
+     
+    
+   
+   if(decoded){
+    if (decoded.exp < 1726449020) {
+        //if(0!=0 || !tokenisValid()){
+        return res.json({ error: 'hahaha' })
     }
+    
 
+    return res.render('links/novo', { token:token ,display: 'none'});
+
+   } else {
+    return res.json({ error: 'hahaha' })
+   }
+
+    
+} catch (error) {
+    console.log(error)
+    
+   }
+
+    
+
+});
+router.post('/novo', async (req, res) => {
+    const { token } = req.query;  
+    
+
+   
+    try {
+        decoded = await decodeToken(token);
+      
+      if(decoded){
+       if (!decoded.usages) {
+           //if(0!=0 || !tokenisValid()){
+           return res.json({ error: 'hahaha' })
+       }
+       const tokeny = await createToken();
+   
+       return res.render('links/novo', { token:tokeny ,display: 'block'});
+   
+      } else {
+       return res.json({ error: 'hahaha' })
+      }
+   
+       
+   } catch (error) {
+       console.log(error)
+       
+      }
 });
 
 

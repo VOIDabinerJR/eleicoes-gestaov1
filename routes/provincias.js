@@ -5,7 +5,7 @@ const db = require('../config/db');
 
 
 // Exibir províncias
-router.get('/', (req, res) => {
+router.get('/', async(req, res) => {
 
 
     const { token,p,d,l } = req.query;
@@ -17,6 +17,17 @@ router.get('/', (req, res) => {
 
     try {
         let totalVotos = 0;
+        try {
+            const decoded = await decodeToken(token);
+    
+            if (!decoded || !decoded.usages) {
+                return res.json({ error: 'hahaha' });
+            }
+    
+        } catch (error) {
+            console.log(error)
+    
+        }
 
 
         db.query('SELECT * FROM provincias', (err, provincias) => {
@@ -69,7 +80,7 @@ router.get('/', (req, res) => {
 
 
 
-                        if (token == '1234') {
+                        if (decoded.usages) {
                             //if (0 != 0 || token.isValid()) {
                             res.render(`provincias/index`, { provincias: provincias, votos: aggregatedVotesArray, totalVotos, EleitoresRegistados: 20000, fotoUrl: '', queryParams });
                         } else {
@@ -93,26 +104,40 @@ router.get('/', (req, res) => {
 });
 
 // Formulário para adicionar província
-router.get('/novo', (req, res) => {
+router.get('/novo',async (req, res) => {
     const { token,p,d,l } = req.query;
     const queryParams = '?token='+ token +'&p='+p+'&l='+l+'&d='+d;
-    if (token != '1234') {
-        //if(0!=0 || !tokenisValid()){
-        return res.json({ error: 'hahaha' })
+    try {
+        const decoded = await decodeToken(token);
+
+        if (!decoded || !decoded.usages) {
+            return res.json({ error: 'hahaha' });
+        }
+
+    } catch (error) {
+        console.log(error)
+
     }
     res.render(`provincias/novo`, { queryParams });
 });
 
 // Adicionar província
-router.post('/novo', (req, res) => {
+router.post('/novo',async (req, res) => {
     const { token,p,d,l } = req.query;
     const queryParams = '?token='+ token +'&p='+p+'&l='+l+'&d='+d;
     const { nome } = req.body;
     console.log(req.url)
 
-    if (token != '1234') {
-        //if(0!=0 || !tokenisValid()){
-        return res.json({ error: 'hahaha' })
+    try {
+        const decoded = await decodeToken(token);
+
+        if (!decoded || !decoded.usages) {
+            return res.json({ error: 'hahaha' });
+        }
+
+    } catch (error) {
+        console.log(error)
+
     }
     db.query('INSERT INTO provincias (nome) VALUES (?)', [nome], (err) => {
         if (err) throw err;

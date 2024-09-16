@@ -6,8 +6,19 @@ require('dotenv').config();
 
     
 // Exibir candidatos
-router.get('/', (req, res) => {
+router.get('/',async (req, res) => {
     const { token } = req.query;
+    try {
+        const decoded = await decodeToken(token);
+
+        if (!decoded || !decoded.usages) {
+            return res.json({ error: 'hahaha' });
+        }
+
+    } catch (error) {
+        console.log(error)
+
+    }
     db.query('SELECT * FROM candidatos', (err, rows) => {
         if (err) throw err;
         if(token =='1234'){
@@ -20,8 +31,19 @@ router.get('/', (req, res) => {
 
 // Formulário para adicionar candidato
 
-router.get('/novo', (req, res) => {
-    if( token =='1234'){
+router.get('/novo',async (req, res) => {
+    try {
+        const decoded = await decodeToken(token);
+
+        if (!decoded || !decoded.usages) {
+            return res.json({ error: 'hahaha' });
+        }
+
+    } catch (error) {
+        console.log(error)
+
+    }
+    if( decoded.usages){
         res.render('candidatos/novo');
     }else {
         res.render('candidatos/main');
@@ -30,12 +52,19 @@ router.get('/novo', (req, res) => {
 });
 
 // Adicionar candidato
-router.post('/novo', (req, res) => {
+router.post('/novo', async(req, res) => {
     const { nome, partido } = req.body;
     const { token } = req.query;
-    if (token != '1234') {
-        //if(0!=0 || !tokenisValid()){
-        return res.json({ error: 'hahaha' })
+    try {
+        const decoded = await decodeToken(token);
+
+        if (!decoded || !decoded.usages) {
+            return res.json({ error: 'hahaha' });
+        }
+
+    } catch (error) {
+        console.log(error)
+
     }
     db.query('INSERT INTO candidatos (nome, partido) VALUES (?, ?)', [nome, partido], (err) => {
         if (err) throw err;

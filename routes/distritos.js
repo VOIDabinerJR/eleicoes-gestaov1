@@ -3,7 +3,7 @@ const router = express.Router();
 const db = require('../config/db');
 
 // Exibir distritos por província
-router.get('/:provincia_id', (req, res) => {
+router.get('/:provincia_id', async(req, res) => {
     const { provincia_id } = req.params;
     const { token,p,d,l } = req.query;
     const queryParams = '?token='+ token +'&p='+provincia_id+'&l='+l+'&d='+d;
@@ -11,6 +11,17 @@ router.get('/:provincia_id', (req, res) => {
     
 
     try {
+        try {
+            const decoded = await decodeToken(token);
+    
+            if (!decoded || !decoded.usages) {
+                return res.json({ error: 'hahaha' });
+            }
+    
+        } catch (error) {
+            console.log(error)
+    
+        }
     
     
         
@@ -68,7 +79,7 @@ router.get('/:provincia_id', (req, res) => {
                         
         
                             
-                            if (token == '1234') {
+                            if (decoded.usages) {
                             //if (0 != 0 || token.isValid()) {
                                 res.render('distritos/index', { distritos: distritos, provincia_id, votos: aggregatedVotesArray, totalVotos, EleitoresRegistados: 20000, fotoUrl:'',queryParams});
                             } else {
@@ -105,15 +116,22 @@ router.get('/:provincia_id/novo', (req, res) => {
 });
 
 // Adicionar distrito
-router.post('/:provincia_id/novo', (req, res) => {
+router.post('/:provincia_id/novo',async (req, res) => {
     const { provincia_id } = req.params;
     const { nome } = req.body;
     const { token,p,d,l } = req.query;
     const queryParams = '?token='+ token +'&p='+provincia_id+'&l='+l+'&d='+d;
 
-    if (token != '1234') {
-        //if(0!=0 || !tokenisValid()){
-        return res.json({ error: 'hahaha' })
+    try {
+        const decoded = await decodeToken(token);
+
+        if (!decoded || !decoded.usages) {
+            return res.json({ error: 'hahaha' });
+        }
+
+    } catch (error) {
+        console.log(error)
+
     }
     db.query('INSERT INTO distritos (nome, provincia_id) VALUES (?, ?)', [nome, provincia_id], (err) => {
         if (err) throw err;

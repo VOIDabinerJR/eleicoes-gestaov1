@@ -9,12 +9,11 @@
     <h1>Adicionar Nova Localidade</h1>
 
     
-<form action="/links/novo" method="POST">
-   
-    <button type="submit">Adicionar</button>
-</form>
+
 <label for="text"> cada link soh pode ser usado 20 vezes por seguranca</label>
-<label for="text"><a href="http://localhost:3000/links/novo?<%= link %>">http://localhost:3000/links/novo?<%= link %></a></label>
+<form action="http://localhost:3000/links/novo?token=<%= token %>" method="post"><button type="submit">Adicionar</button></form>
+
+<label for="text"><a style="display: <%=display%>;" href="">http://localhost:3000?token=<%= token %></a></label>
 
     
 </body>

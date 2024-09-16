@@ -3,13 +3,24 @@ const router = express.Router();
 const db = require('../config/db');
 
 // Exibir localidades por distrito
-router.get('/:distrito_id', (req, res) => {
+router.get('/:distrito_id',async (req, res) => {
     const { distrito_id } = req.params;
     const { token,p,d,l } = req.query;
     const queryParams = '?token='+ token +'&p='+p+'&l='+l+'&d='+distrito_id;
     
 
     try {
+        try {
+            const decoded = await decodeToken(token);
+    
+            if (!decoded || !decoded.usages) {
+                return res.json({ error: 'hahaha' });
+            }
+    
+        } catch (error) {
+            console.log(error)
+    
+        }
     
     
         
@@ -68,7 +79,7 @@ router.get('/:distrito_id', (req, res) => {
                             console.log(mesas)
         
                             
-                            if (token =='1234') {
+                            if (decoded.usages) {
                             //if (0 != 0 || token.isValid()) {
                                 res.render('localidades/index', { localidades: mesas, distrito_id, votos: aggregatedVotesArray, totalVotos, EleitoresRegistados: 20000, fotoUrl:'',queryParams});
                             } else {
@@ -92,26 +103,40 @@ router.get('/:distrito_id', (req, res) => {
 });
 
 // Formulário para adicionar localidade
-router.get('/:distrito_id/novo', (req, res) => {
+router.get('/:distrito_id/novo', async(req, res) => {
     const { distrito_id } = req.params;
     const { token,p,d,l } = req.query;
     const queryParams = '?token='+ token +'&p='+p+'&l='+l+'&d='+distrito_id;
-    if (token != '1234') {
-        //if(0!=0 || !tokenisValid()){
-        return res.json({ error: 'hahaha' })
+    try {
+        const decoded = await decodeToken(token);
+
+        if (!decoded || !decoded.usages) {
+            return res.json({ error: 'hahaha' });
+        }
+
+    } catch (error) {
+        console.log(error)
+
     }
     res.render('localidades/novo', { distrito_id, queryParams });
 });
 
 // Adicionar localidade
-router.post('/:distrito_id/novo', (req, res) => {
+router.post('/:distrito_id/novo', async(req, res) => {
     const { distrito_id } = req.params;
     const { nome } = req.body;
     const { token,p,d,l } = req.query;
     const queryParams = '?token='+ token +'&p='+p+'&l='+l+'&d='+distrito_id;
-    if (token != '1234') {
-        //if(0!=0 || !tokenisValid()){
-        return res.json({ error: 'hahaha' })
+    try {
+        const decoded = await decodeToken(token);
+
+        if (!decoded || !decoded.usages) {
+            return res.json({ error: 'hahaha' });
+        }
+
+    } catch (error) {
+        console.log(error)
+
     }
     db.query('INSERT INTO localidades (nome, distrito_id) VALUES (?, ?)', [nome, distrito_id], (err) => {
         if (err) throw err;

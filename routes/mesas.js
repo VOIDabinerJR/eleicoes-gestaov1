@@ -3,14 +3,24 @@ const router = express.Router();
 const db = require('../config/db');
 
 // Exibir mesas
-router.get('/:localidade_id', (req, res) => {
+router.get('/:localidade_id', async(req, res) => {
     const { localidade_id } = req.params;
     let mesas = null;
     const { token,p,d,l } = req.query;
     const queryParams = '?token='+ token +'&p='+p+'&l='+localidade_id+'&d='+d;
     
     try {
+        try {
+            const decoded = await decodeToken(token);
     
+            if (!decoded || !decoded.usages) {
+                return res.json({ error: 'hahaha' });
+            }
+    
+        } catch (error) {
+            console.log(error)
+    
+        }
     
         
    
@@ -67,7 +77,7 @@ router.get('/:localidade_id', (req, res) => {
                             console.log(mesas)
         
                             
-                            if (token =='1234') {
+                            if (dedoded.usages) {
                             //if (0 != 0 || token.isValid()) {
                                 res.render('mesas/index', { mesas: mesas, localidade_id, votos: aggregatedVotesArray, totalVotos, EleitoresRegistados: 20000, fotoUrl:'', queryParams});
                             } else {
@@ -92,31 +102,44 @@ router.get('/:localidade_id', (req, res) => {
 
 
 // Formulário para adicionar localidade
-router.get('/:localidade_id/novo', (req, res) => {
+router.get('/:localidade_id/novo',async (req, res) => {
     const { localidade_id  } = req.params;
     const { token,p,d,l } = req.query;
     const queryParams = '?token='+ token +'&p='+p+'&l='+localidade_id+'&d='+d;
-    if (token != '1234') {
-        //if(0!=0 || !tokenisValid()){
-        return res.json({ error: 'hahaha'})
+    try {
+        const decoded = await decodeToken(token);
+
+        if (!decoded || !decoded.usages) {
+            return res.json({ error: 'hahaha' });
+        }
+
+    } catch (error) {
+        console.log(error)
+
     }
-    
         res.render('mesas/novo', { localidade_id,queryParams  });
    
    
 });
 
 // Adicionar mesa
-router.post('/:localidade_id/novo', (req, res) => {
+router.post('/:localidade_id/novo', async(req, res) => {
     const { localidade_id  } = req.params;
     const { nome } = req.body;
     const { token,p,d,l } = req.query;
     console.log(req.query)
     const queryParams = '?token='+ token +'&p='+p+'&l='+localidade_id+'&d='+d;
 
-    if (token != '1234') {
-        //if(0!=0 || !tokenisValid()){
-        return res.json({ error: 'hahaha' })
+    try {
+        const decoded = await decodeToken(token);
+
+        if (!decoded || !decoded.usages) {
+            return res.json({ error: 'hahaha' });
+        }
+
+    } catch (error) {
+        console.log(error)
+
     }
     db.query('INSERT INTO mesas (nome, localidade_id) VALUES (?, ?)', [nome, localidade_id], (err) => {
         if (err) throw err;
