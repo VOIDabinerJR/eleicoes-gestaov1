@@ -228,7 +228,7 @@ router.get('/:mesa_id/novo', async (req, res) => {
 
 
 router.post('/:mesa_id/novo', upload.single('foto'),async (req, res) => {
-    const foto = req.file;
+    const { foto_url } = req.body;
     const { candidatos } = req.body;
     const { mesa_id } = req.params;
     const { token, p, d, l } = req.query;
@@ -251,14 +251,7 @@ router.post('/:mesa_id/novo', upload.single('foto'),async (req, res) => {
 
     }
 
-
-    if (foto) {
-        console.log('Foto:', foto.path);
-        // console.log('Foto URL:', foto.secure_url);
-    } else {
-        console.log('Nenhuma foto enviada');
-    }
-
+    console.log(req.body)
 
     if (candidatos) {
         candidatos.forEach(candidato => {
@@ -266,12 +259,12 @@ router.post('/:mesa_id/novo', upload.single('foto'),async (req, res) => {
             if (id != 'null' && id != null) {
                 totalVotos = totalVotos + parseInt(votos)
 
-            }
-        });
+            } 
+        });   
     }
 
     db.query('INSERT INTO atas (mesa_id, quantidade_votos, foto_url) VALUES (?, ?, ?)',
-        [mesa_id, totalVotos, foto ? foto.secure_url : req.body.foto], (err, results) => {
+        [mesa_id, totalVotos, foto_url], (err, results) => {
             if (err) throw err;
             let ataId = results.insertId;
 
